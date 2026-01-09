@@ -8,52 +8,10 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { useData } from "@/contexts/DataProvider";
 
 const DataTable = () => {
-  const data = [
-    {
-      provinsi: "Kota Sorong",
-      stunting: 22.0,
-      kemiskinan: 10.5,
-      perumahan: 75.2,
-      status: "Prioritas Sedang",
-    },
-    {
-      provinsi: "Kabupaten Sorong",
-      stunting: 18.0,
-      kemiskinan: 9.5,
-      perumahan: 68.7,
-      status: "Baik",
-    },
-    {
-      provinsi: "Kabupaten Raja Ampat",
-      stunting: 17.0,
-      kemiskinan: 8.2,
-      perumahan: 71.3,
-      status: "Baik",
-    },
-    {
-      provinsi: "Kabupaten Sorong Selatan",
-      stunting: 15.0,
-      kemiskinan: 7.9,
-      perumahan: 62.5,
-      status: "Prioritas Sedang",
-    },
-    {
-      provinsi: "Kabupaten Maybrat",
-      stunting: 14.0,
-      kemiskinan: 7.5,
-      perumahan: 58.9,
-      status: "Prioritas Tinggi",
-    },
-    {
-      provinsi: "Kabupaten Tambrauw",
-      stunting: 14.0,
-      kemiskinan: 6.4,
-      perumahan: 55.4,
-      status: "Prioritas Tinggi",
-    },
-  ];
+  const { data } = useData();
 
   const getStatusBadge = (status: string) => {
     if (status === "Prioritas Tinggi") {
