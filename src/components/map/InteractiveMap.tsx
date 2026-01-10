@@ -6,91 +6,24 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { MapPin } from "lucide-react";
+import { useData } from "@/contexts/DataProvider";
 
-interface MapData {
-  type: "FeatureCollection";
-  features: Array<{
-    type: "Feature";
-    properties: {
-      name: string;
-      stunting: number;
-      poverty: number;
-      housing: number;
-      infrastructure: string;
-    };
-    geometry: {
-      type: "Point";
-      coordinates: [number, number];
-    };
-  }>;
-}
 
 const InteractiveMap = () => {
+  const { data } = useData();
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
   const [mapboxToken, setMapboxToken] = useState("");
   const [isMapInitialized, setIsMapInitialized] = useState(false);
 
-  // Sample data untuk provinsi di Indonesia dengan fokus Papua Barat (Sorong)
-  const mapData: MapData = {
-    type: "FeatureCollection",
-    features: [
-      {
-        type: "Feature",
-        properties: {
-          name: "Kec. Sorong Timur",
-          stunting: 32.5,
-          poverty: 15.8,
-          housing: 52.3,
-          infrastructure: "Air Bersih: Terbatas, Sanitasi: Rendah",
-        },
-        geometry: { type: "Point", coordinates: [131.2599, -0.8618] },
-      },
-      {
-        type: "Feature",
-        properties: {
-          name: "Kec. Sorong Barat",
-          stunting: 28.3,
-          poverty: 13.2,
-          housing: 61.5,
-          infrastructure: "Air Bersih: Sedang, Sanitasi: Sedang",
-        },
-        geometry: { type: "Point", coordinates: [131.2199, -0.8818] },
-      },
-      {
-        type: "Feature",
-        properties: {
-          name: "Kec. Sorong Utara",
-          stunting: 25.7,
-          poverty: 11.5,
-          housing: 68.2,
-          infrastructure: "Air Bersih: Baik, Sanitasi: Baik",
-        },
-        geometry: { type: "Point", coordinates: [131.2499, -0.8418] },
-      },
-      {
-        type: "Feature",
-        properties: {
-          name: "Kec. Sorong Kepulauan",
-          stunting: 35.2,
-          poverty: 18.9,
-          housing: 45.6,
-          infrastructure: "Air Bersih: Sangat Terbatas, Sanitasi: Sangat Rendah",
-        },
-        geometry: { type: "Point", coordinates: [131.1899, -0.9018] },
-      },
-      {
-        type: "Feature",
-        properties: {
-          name: "Kec. Sorong Manoi",
-          stunting: 22.1,
-          poverty: 9.8,
-          housing: 74.3,
-          infrastructure: "Air Bersih: Baik, Sanitasi: Baik",
-        },
-        geometry: { type: "Point", coordinates: [131.2799, -0.8518] },
-      },
-    ],
+  // Approximate centroids for the regions
+  const coordinatesMap: Record<string, [number, number]> = {
+    "Kota Sorong": [131.255, -0.875],
+    "Kabupaten Sorong": [131.500, -0.950],
+    "Kabupaten Raja Ampat": [130.820, -0.500],
+    "Kabupaten Sorong Selatan": [132.000, -1.500],
+    "Kabupaten Maybrat": [132.450, -1.200],
+    "Kabupaten Tambrauw": [132.500, -0.650],
   };
 
   const initializeMap = () => {
@@ -101,8 +34,8 @@ const InteractiveMap = () => {
     map.current = new mapboxgl.Map({
       container: mapContainer.current,
       style: "mapbox://styles/mapbox/light-v11",
-      center: [131.2499, -0.8718], // Centered on Sorong
-      zoom: 11,
+      center: [131.5, -1.0],
+      zoom: 8,
       pitch: 45,
     });
 
@@ -116,23 +49,25 @@ const InteractiveMap = () => {
     map.current.on("load", () => {
       if (!map.current) return;
 
-      // Add markers for each location
-      mapData.features.forEach((feature) => {
-        const { coordinates } = feature.geometry;
-        const { name, stunting, poverty, housing, infrastructure } = feature.properties;
+      // Add markers for each region from the dynamic data
+      data.forEach((region) => {
+        const coordinates = coordinatesMap[region.provinsi];
+        if (!coordinates) return;
 
-        // Determine marker color based on stunting level
-        const markerColor =
-          stunting > 30 ? "#ef4444" : stunting > 25 ? "#f59e0b" : "#22c55e";
+        // Determine marker color based on status
+        let markerColor = "#22c55e"; // Baik (Green)
+        if (region.status === "Prioritas Tinggi") markerColor = "#ef4444"; // Red
+        else if (region.status === "Prioritas Sedang") markerColor = "#f59e0b"; // Orange
 
         // Create popup content
         const popupContent = `
           <div class="p-2">
-            <h3 class="font-bold text-sm mb-1">${name}</h3>
-            <p class="text-xs"><strong>Stunting:</strong> ${stunting}%</p>
-            <p class="text-xs"><strong>Kemiskinan:</strong> ${poverty}%</p>
-            <p class="text-xs"><strong>Rumah Layak:</strong> ${housing}%</p>
-            <p class="text-xs mt-1"><strong>Infrastruktur:</strong><br/>${infrastructure}</p>
+            <h3 class="font-bold text-sm mb-1">${region.provinsi}</h3>
+            <p class="text-xs"><strong>Status:</strong> ${region.status}</p>
+            <hr class="my-1"/>
+            <p class="text-xs"><strong>Stunting:</strong> ${region.stunting}%</p>
+            <p class="text-xs"><strong>Kemiskinan:</strong> ${region.kemiskinan}%</p>
+            <p class="text-xs"><strong>Rumah Layak:</strong> ${region.perumahan}%</p>
           </div>
         `;
 
@@ -148,7 +83,7 @@ const InteractiveMap = () => {
         el.style.boxShadow = "0 2px 8px rgba(0,0,0,0.3)";
 
         new mapboxgl.Marker(el)
-          .setLngLat(coordinates as [number, number])
+          .setLngLat(coordinates)
           .setPopup(new mapboxgl.Popup({ offset: 25 }).setHTML(popupContent))
           .addTo(map.current!);
       });
