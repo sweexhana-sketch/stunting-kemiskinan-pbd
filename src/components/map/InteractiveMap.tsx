@@ -1,45 +1,102 @@
-import { useRef } from "react";
-import { Card } from "@/components/ui/card";
+import { useRef, useEffect, useState } from "react";
 import { useData } from "@/contexts/DataProvider";
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import { MapContainer, TileLayer, GeoJSON, Popup } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
-import L from "leaflet";
-import { MapPin } from "lucide-react";
-
-// Fix Leaflet default icon issue in React
-import icon from "leaflet/dist/images/marker-icon.png";
-import iconShadow from "leaflet/dist/images/marker-shadow.png";
-
-let DefaultIcon = L.icon({
-  iconUrl: icon,
-  shadowUrl: iconShadow,
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-});
-
-L.Marker.prototype.options.icon = DefaultIcon;
-
-// Custom colored icons
-const createColoredIcon = (color: string) => {
-  return L.divIcon({
-    className: "custom-div-icon",
-    html: `<div style="background-color: ${color}; width: 30px; height: 30px; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 8px rgba(0,0,0,0.3);"></div>`,
-    iconSize: [30, 30],
-    iconAnchor: [15, 15],
-  });
-};
+// import L from "leaflet"; // Removed as we are switching to polygons
+import * as shp from "shpjs";
 
 const InteractiveMap = () => {
   const { data } = useData();
+  const [geoData, setGeoData] = useState<any | null>(null);
 
-  // Approximate centroids for the regions
-  const coordinatesMap: Record<string, [number, number]> = {
-    "Kota Sorong": [-0.875, 131.255], // Lat, Lng
-    "Kabupaten Sorong": [-0.950, 131.500],
-    "Kabupaten Raja Ampat": [-0.500, 130.820],
-    "Kabupaten Sorong Selatan": [-1.500, 132.000],
-    "Kabupaten Maybrat": [-1.200, 132.450],
-    "Kabupaten Tambrauw": [-0.650, 132.500],
+  useEffect(() => {
+    // Load the shapefile (zipped)
+    const loadShapefile = async () => {
+      try {
+        const response = await fetch("/shp/desapbd/btskab.zip");
+        const buffer = await response.arrayBuffer();
+        const geojson = await shp.parseZip(buffer);
+
+        console.log("GeoJSON loaded:", geojson);
+
+        if (Array.isArray(geojson)) {
+          setGeoData(geojson[0]);
+        } else {
+          setGeoData(geojson);
+        }
+      } catch (err) {
+        console.error("Error loading shapefile:", err);
+      }
+    };
+
+    loadShapefile();
+  }, []);
+
+  // Helper to find data for a feature
+  const getRegionData = (feature: any) => {
+    if (!feature || !feature.properties) return null;
+
+    // Adjust this property name based on the actual SHP attributes (e.g., KABUPATEN, WA, etc.)
+    // We will dump the properties to console to verify during dev, but for now assuming 'KABUPATEN' or similar matching the DataProvider names
+    // Try to match somewhat loosely to accommodate "Kabupaten" prefix differences if necessary
+    const regionName = feature.properties.KABUPATEN || feature.properties.WADMKK || feature.properties.NAMOBJ;
+
+    if (!regionName) return null;
+
+    // Direct match first
+    let matched = data.find(d => d.provinsi.toLowerCase() === regionName.toLowerCase());
+
+    // Fuzzy match if needed (e.g. "Sorong" vs "Kabupaten Sorong")
+    if (!matched) {
+      matched = data.find(d => d.provinsi.toLowerCase().includes(regionName.toLowerCase()) || regionName.toLowerCase().includes(d.provinsi.toLowerCase()));
+    }
+
+    return matched;
+  };
+
+  const style = (feature: any) => {
+    const region = getRegionData(feature);
+    let fillColor = "#cccccc"; // Default gray
+
+    if (region) {
+      if (region.status === "Prioritas Tinggi") fillColor = "#ef4444";
+      else if (region.status === "Prioritas Sedang") fillColor = "#f59e0b";
+      else if (region.status === "Baik") fillColor = "#22c55e";
+    }
+
+    return {
+      fillColor,
+      weight: 2,
+      opacity: 1,
+      color: "white", // Border color
+      dashArray: "3",
+      fillOpacity: 0.7,
+    };
+  };
+
+  const onEachFeature = (feature: any, layer: any) => {
+    const region = getRegionData(feature);
+    if (!region) {
+      layer.bindPopup("Data not available for this region");
+      return;
+    }
+
+    const popupContent = `
+      <div class="p-2 min-w-[200px]">
+        <h3 class="font-bold text-sm mb-1">${region.provinsi}</h3>
+        <p class="text-xs"><strong>Status:</strong> ${region.status}</p>
+        <hr class="my-1 border-gray-200" />
+        <div class="grid grid-cols-2 gap-x-2 gap-y-1 mt-2">
+          <span class="text-xs font-semibold">Stunting:</span>
+          <span class="text-xs">${region.stunting}%</span>
+          <span class="text-xs font-semibold">Kemiskinan:</span>
+          <span class="text-xs">${region.kemiskinan}%</span>
+          <span class="text-xs font-semibold">Rumah Layak:</span>
+          <span class="text-xs">${region.perumahan}%</span>
+        </div>
+      </div>
+    `;
+    layer.bindPopup(popupContent);
   };
 
   return (
@@ -55,39 +112,15 @@ const InteractiveMap = () => {
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
-          {data.map((region) => {
-            const coordinates = coordinatesMap[region.provinsi];
-            if (!coordinates) return null;
 
-            // Determine marker color based on status
-            let markerColor = "#22c55e"; // Baik (Green)
-            if (region.status === "Prioritas Tinggi") markerColor = "#ef4444"; // Red
-            else if (region.status === "Prioritas Sedang") markerColor = "#f59e0b"; // Orange
+          {geoData && (
+            <GeoJSON
+              data={geoData}
+              style={style}
+              onEachFeature={onEachFeature}
+            />
+          )}
 
-            return (
-              <Marker
-                key={region.provinsi}
-                position={coordinates}
-                icon={createColoredIcon(markerColor)}
-              >
-                <Popup>
-                  <div className="p-2 min-w-[200px]">
-                    <h3 className="font-bold text-sm mb-1">{region.provinsi}</h3>
-                    <p className="text-xs"><strong>Status:</strong> {region.status}</p>
-                    <hr className="my-1 border-gray-200" />
-                    <div className="grid grid-cols-2 gap-x-2 gap-y-1 mt-2">
-                      <span className="text-xs font-semibold">Stunting:</span>
-                      <span className="text-xs">{region.stunting}%</span>
-                      <span className="text-xs font-semibold">Kemiskinan:</span>
-                      <span className="text-xs">{region.kemiskinan}%</span>
-                      <span className="text-xs font-semibold">Rumah Layak:</span>
-                      <span className="text-xs">{region.perumahan}%</span>
-                    </div>
-                  </div>
-                </Popup>
-              </Marker>
-            );
-          })}
         </MapContainer>
       </div>
 
