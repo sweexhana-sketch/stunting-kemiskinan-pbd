@@ -29,13 +29,16 @@ const App = () => (
               <header className="border-b bg-card shadow-sm">
                 <div className="container mx-auto px-4 py-6">
                   <div className="flex items-center gap-3">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-secondary text-primary-foreground">
-                      <BarChart3 className="h-6 w-6" />
+                    <div className="flex items-center gap-2">
+                      <img src="/images/logo-pbd.png" alt="Logo Papua Barat Daya" className="h-16 w-auto object-contain" />
+                      <img src="/images/logo-pupr.png" alt="Logo PUPR" className="h-16 w-auto object-contain" />
                     </div>
                     <div>
-                      <h1 className="text-2xl font-bold text-foreground">SIGAP-PU</h1>
-                      <p className="text-sm text-muted-foreground">
-                        Sistem Informasi Geospasial Analisis Stunting dan Kemiskinan – Pekerjaan Umum
+                      <h1 className="text-lg md:text-xl font-bold text-foreground leading-tight">
+                        SIGAP-DINAS PEKERJAAN UMUM DAN PERUMAHAN RAKYAT<br />PROVINSI PAPUA BARAT DAYA
+                      </h1>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Sistem Informasi Geospasial Analisis Stunting dan Kemiskinan
                       </p>
                     </div>
                   </div>

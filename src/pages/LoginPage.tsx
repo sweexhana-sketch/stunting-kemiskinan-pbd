@@ -50,11 +50,14 @@ const LoginPage = () => {
         <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-primary/5 via-background to-secondary/5 p-4">
             <Card className="w-full max-w-md">
                 <CardHeader className="space-y-4 text-center">
-                    <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-secondary text-primary-foreground">
-                        <BarChart3 className="h-8 w-8" />
+                    <div className="mx-auto flex items-center justify-center gap-4">
+                        <img src="/images/logo-pbd.png" alt="Logo Papua Barat Daya" className="h-20 w-auto object-contain" />
+                        <img src="/images/logo-pupr.png" alt="Logo PUPR" className="h-20 w-auto object-contain" />
                     </div>
                     <div>
-                        <CardTitle className="text-2xl">SIGAP-PU</CardTitle>
+                        <CardTitle className="text-xl leading-relaxed">
+                            SIGAP-DINAS PEKERJAAN UMUM DAN PERUMAHAN RAKYAT<br />PROVINSI PAPUA BARAT DAYA
+                        </CardTitle>
                         <CardDescription className="mt-2">
                             Sistem Informasi Geospasial Analisis Stunting dan Kemiskinan
                         </CardDescription>
