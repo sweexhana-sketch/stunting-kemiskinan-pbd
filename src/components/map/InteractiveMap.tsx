@@ -119,6 +119,7 @@ const InteractiveMap = () => {
 
           {geoData && (
             <GeoJSON
+              key={JSON.stringify(data.map(d => d.color))} // Force re-render when colors change
               data={geoData}
               style={style}
               onEachFeature={onEachFeature}
