@@ -14,11 +14,17 @@ const DataTable = () => {
   const { data } = useData();
 
   const getStatusBadge = (status: string) => {
+    if (status === "Sangat Tinggi") {
+      return <Badge className="bg-red-700 hover:bg-red-800 text-white">{status}</Badge>;
+    }
     if (status === "Prioritas Tinggi") {
       return <Badge variant="destructive">{status}</Badge>;
     }
     if (status === "Prioritas Sedang") {
-      return <Badge className="bg-accent text-accent-foreground">{status}</Badge>;
+      return <Badge className="bg-orange-500 hover:bg-orange-600 text-white">{status}</Badge>;
+    }
+    if (status === "Baik") {
+      return <Badge className="bg-green-500 hover:bg-green-600 text-white">{status}</Badge>;
     }
     return <Badge className="bg-secondary text-secondary-foreground">{status}</Badge>;
   };
