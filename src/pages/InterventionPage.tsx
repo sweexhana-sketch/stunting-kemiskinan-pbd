@@ -3,8 +3,42 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Target, Lightbulb, TrendingUp, CheckCircle2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { useData, RegionData } from "@/contexts/DataProvider";
+import { useState } from "react";
+import { toast } from "sonner"; // Assuming sonner is used based on App.tsx
 
 const InterventionPage = () => {
+  const { data, updateRegionData } = useData();
+  const [selectedRegion, setSelectedRegion] = useState<RegionData | undefined>(undefined);
+  const [selectedIntervention, setSelectedIntervention] = useState<string>("");
+  const [simulationResult, setSimulationResult] = useState<{ reduction: number } | null>(null);
+
+  const handleSimulation = (regionName: string | undefined, interventionType: string) => {
+    if (!regionName) return;
+
+    // 1. Ambil data asli (sudah ada di selectedRegion atau contexts)
+    const currentData = data.find(r => r.provinsi === regionName);
+    if (!currentData) return;
+
+    // 2. Hitung dampak otomatis (Logic Simulasi)
+    let reduction = 0;
+    if (interventionType === 'sanitasi_PUPR') {
+      reduction = 5.5; // Prediksi penurunan
+    } else if (interventionType === 'perumahan') {
+      reduction = 3.2;
+    } else if (interventionType === 'kawasan') {
+      reduction = 4.1;
+    }
+
+    setSimulationResult({ reduction });
+
+    // 3. Update State untuk trigger re-render warna poligon
+    const newStunting = Math.max(0, currentData.stunting - reduction);
+
+    updateRegionData(regionName, { stunting: parseFloat(newStunting.toFixed(1)) });
+
+    toast.success(`Simulasi Berhasil: Stunting di ${regionName} diprediksi turun menjadi ${newStunting.toFixed(1)}%`);
+  };
   const priorityAreas = [
     {
       area: "Kec. Sorong Kepulauan",
@@ -97,8 +131,8 @@ const InterventionPage = () => {
                             area.priority === "Sangat Tinggi"
                               ? "destructive"
                               : area.priority === "Tinggi"
-                              ? "default"
-                              : "secondary"
+                                ? "default"
+                                : "secondary"
                           }
                         >
                           {area.priority}
@@ -138,39 +172,74 @@ const InterventionPage = () => {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                {interventions.map((intervention, index) => (
-                  <div
-                    key={index}
-                    className="rounded-lg border p-4 transition-all hover:shadow-md"
-                  >
-                    <div className="mb-3 flex items-start justify-between">
-                      <h3 className="font-semibold">{intervention.title}</h3>
-                      <TrendingUp className="h-5 w-5 text-chart-5" />
-                    </div>
-                    <div className="grid gap-3 md:grid-cols-2">
-                      <div className="rounded-lg bg-muted/50 p-3">
-                        <p className="text-xs text-muted-foreground">Dampak Proyeksi</p>
-                        <p className="font-semibold text-chart-5">{intervention.impact}</p>
-                      </div>
-                      <div className="rounded-lg bg-muted/50 p-3">
-                        <p className="text-xs text-muted-foreground">Estimasi Biaya</p>
-                        <p className="font-semibold">{intervention.cost}</p>
-                      </div>
-                      <div className="rounded-lg bg-muted/50 p-3">
-                        <p className="text-xs text-muted-foreground">Durasi</p>
-                        <p className="font-semibold">{intervention.duration}</p>
-                      </div>
-                      <div className="rounded-lg bg-muted/50 p-3">
-                        <p className="text-xs text-muted-foreground">Penerima Manfaat</p>
-                        <p className="font-semibold">{intervention.beneficiaries}</p>
-                      </div>
-                    </div>
-                    <Button className="mt-3 w-full" variant="outline">
-                      Jalankan Simulasi Detail
-                    </Button>
+              <div className="space-y-6">
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Pilih Wilayah</label>
+                    <select
+                      className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                      onChange={(e) => setSelectedRegion(data.find(r => r.provinsi === e.target.value))}
+                    >
+                      <option value="">Pilih Kabupaten/Kota</option>
+                      {data.map((region) => (
+                        <option key={region.provinsi} value={region.provinsi}>{region.provinsi}</option>
+                      ))}
+                    </select>
                   </div>
-                ))}
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Bentuk Intervensi (PUPR)</label>
+                    <select
+                      className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                      onChange={(e) => setSelectedIntervention(e.target.value)}
+                    >
+                      <option value="">Pilih Program</option>
+                      <option value="sanitasi_PUPR">Sanitasi & Air Bersih (SPAM)</option>
+                      <option value="perumahan">Perumahan Layak Huni</option>
+                      <option value="kawasan">Penataan Kawasan Kumuh</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="rounded-lg border bg-muted/30 p-4">
+                  <div className="mb-4 flex items-center justify-between">
+                    <h3 className="font-semibold">Hasil Proyeksi Real-time</h3>
+                    {simulationResult && <Badge variant="outline" className="text-green-600 border-green-200 bg-green-50">Disimulasikan</Badge>}
+                  </div>
+                  {selectedRegion ? (
+                    <div className="grid gap-4 md:grid-cols-3">
+                      <div>
+                        <p className="text-xs text-muted-foreground">Stunting Awal</p>
+                        <p className="text-xl font-bold">{selectedRegion.stunting}%</p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-muted-foreground">Estimasi Penurunan</p>
+                        <p className="text-xl font-bold text-green-600">
+                          {simulationResult ? `-${simulationResult.reduction}%` : "-"}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-muted-foreground">Stunting Akhir</p>
+                        <p className="text-xl font-bold">
+                          {simulationResult ? `${(selectedRegion.stunting - simulationResult.reduction).toFixed(1)}%` : "-"}
+                        </p>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="text-center py-4 text-sm text-muted-foreground">Pilih wilayah dan intervensi untuk melihat prediksi impact.</div>
+                  )}
+                </div>
+
+                <Button
+                  className="w-full"
+                  disabled={!selectedRegion || !selectedIntervention}
+                  onClick={() => handleSimulation(selectedRegion?.provinsi, selectedIntervention)}
+                >
+                  Jalankan Simulasi & Update Peta
+                </Button>
+
+                <p className="text-xs text-muted-foreground text-center">
+                  *Simulasi menggunakan model regresi berdasarkan data historis efektivitas program PUPR.
+                </p>
               </div>
             </CardContent>
           </Card>

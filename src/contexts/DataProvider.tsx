@@ -95,6 +95,13 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return "Sedang";
     };
 
+    const getColorForStatus = (status: string): string => {
+        if (status === "Sangat Tinggi") return "#FF0000";
+        if (status === "Tinggi") return "#FFA500";
+        if (status === "Sedang") return "#FFFF00";
+        return "#22c55e"; // Default Baik
+    };
+
     const updateRegionData = (regionName: string, newData: Partial<RegionData>) => {
         setData((prev) =>
             prev.map((item) => {
@@ -106,6 +113,9 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
                         updatedItem.kemiskinan,
                         updatedItem.perumahan
                     );
+                    // Recalculate color automatically based on new status
+                    updatedItem.color = getColorForStatus(updatedItem.status);
+
                     return updatedItem;
                 }
                 return item;
