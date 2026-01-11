@@ -17,7 +17,7 @@ const InterventionPage = () => {
     if (!regionName) return;
 
     // 1. Ambil data asli (sudah ada di selectedRegion atau contexts)
-    const currentData = data.find(r => r.provinsi === regionName);
+    const currentData = data.find(r => r.kabupaten === regionName);
     if (!currentData) return;
 
     // 2. Hitung dampak otomatis (Logic Simulasi)
@@ -35,7 +35,7 @@ const InterventionPage = () => {
     // 3. Update State untuk trigger re-render warna poligon
     const newStunting = Math.max(0, currentData.stunting - reduction);
 
-    updateRegionData(regionName, { stunting: parseFloat(newStunting.toFixed(1)) });
+    updateRegionData('name', regionName, { stunting: parseFloat(newStunting.toFixed(1)) });
 
     toast.success(`Simulasi Berhasil: Stunting di ${regionName} diprediksi turun menjadi ${newStunting.toFixed(1)}%`);
   };
@@ -178,11 +178,11 @@ const InterventionPage = () => {
                     <label className="text-sm font-medium">Pilih Wilayah</label>
                     <select
                       className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                      onChange={(e) => setSelectedRegion(data.find(r => r.provinsi === e.target.value))}
+                      onChange={(e) => setSelectedRegion(data.find(r => r.kabupaten === e.target.value))}
                     >
                       <option value="">Pilih Kabupaten/Kota</option>
                       {data.map((region) => (
-                        <option key={region.provinsi} value={region.provinsi}>{region.provinsi}</option>
+                        <option key={region.kabupaten} value={region.kabupaten}>{region.kabupaten}</option>
                       ))}
                     </select>
                   </div>
@@ -232,7 +232,7 @@ const InterventionPage = () => {
                 <Button
                   className="w-full"
                   disabled={!selectedRegion || !selectedIntervention}
-                  onClick={() => handleSimulation(selectedRegion?.provinsi, selectedIntervention)}
+                  onClick={() => handleSimulation(selectedRegion?.kabupaten, selectedIntervention)}
                 >
                   Jalankan Simulasi & Update Peta
                 </Button>

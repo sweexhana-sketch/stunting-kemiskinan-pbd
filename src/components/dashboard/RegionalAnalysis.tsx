@@ -10,8 +10,8 @@ const RegionalAnalysis = ({ type }: RegionalAnalysisProps) => {
   const { data: contextData } = useData();
 
   const dataMap = {
-    stunting: contextData.map(item => ({ name: item.provinsi, value: item.stunting, color: item.color })),
-    poverty: contextData.map(item => ({ name: item.provinsi, value: item.kemiskinan, color: item.color })), // Using same color coding for consistency
+    stunting: contextData.map(item => ({ name: item.kabupaten, value: item.stunting, color: item.color })),
+    poverty: contextData.map(item => ({ name: item.kabupaten, value: item.kemiskinan, color: item.color })), // Using same color coding for consistency
     housing: [
       { name: "Layak Huni", value: 66.8, color: "#22c55e" },
       { name: "Perlu Renovasi", value: 23.5, color: "#f59e0b" },

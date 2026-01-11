@@ -37,18 +37,16 @@ const InteractiveMap = () => {
     if (!feature || !feature.properties) return null;
 
     // Adjust this property name based on the actual SHP attributes (e.g., KABUPATEN, WA, etc.)
-    // We will dump the properties to console to verify during dev, but for now assuming 'KABUPATEN' or similar matching the DataProvider names
-    // Try to match somewhat loosely to accommodate "Kabupaten" prefix differences if necessary
     const regionName = feature.properties.KABUPATEN || feature.properties.WADMKK || feature.properties.NAMOBJ;
 
     if (!regionName) return null;
 
-    // Direct match first
-    let matched = data.find(d => d.provinsi.toLowerCase() === regionName.toLowerCase());
+    // Direct match first (using kabupaten)
+    let matched = data.find(d => d.kabupaten.toLowerCase() === regionName.toLowerCase());
 
     // Fuzzy match if needed (e.g. "Sorong" vs "Kabupaten Sorong")
     if (!matched) {
-      matched = data.find(d => d.provinsi.toLowerCase().includes(regionName.toLowerCase()) || regionName.toLowerCase().includes(d.provinsi.toLowerCase()));
+      matched = data.find(d => d.kabupaten.toLowerCase().includes(regionName.toLowerCase()) || regionName.toLowerCase().includes(d.kabupaten.toLowerCase()));
     }
 
     return matched;
@@ -87,8 +85,9 @@ const InteractiveMap = () => {
 
     const popupContent = `
       <div class="p-2 min-w-[200px]">
-        <h3 class="font-bold text-sm mb-1">${region.provinsi}</h3>
+        <h3 class="font-bold text-sm mb-1">${region.kabupaten}</h3>
         <p class="text-xs"><strong>Status:</strong> ${region.status}</p>
+        <p class="text-[10px] text-gray-500 italic mt-0.5 mb-1">"${region.keterangan || '-'}"</p>
         <hr class="my-1 border-gray-200" />
         <div class="grid grid-cols-2 gap-x-2 gap-y-1 mt-2">
           <span class="text-xs font-semibold">Stunting:</span>
@@ -96,7 +95,7 @@ const InteractiveMap = () => {
           <span class="text-xs font-semibold">Kemiskinan:</span>
           <span class="text-xs">${region.kemiskinan}%</span>
           <span class="text-xs font-semibold">Rumah Layak:</span>
-          <span class="text-xs">${region.perumahan}%</span>
+          <span class="text-xs">${region.rumah_layak_pct}%</span>
         </div>
       </div>
     `;

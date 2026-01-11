@@ -1,17 +1,19 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
 export interface RegionData {
-    provinsi: string; // Used as unique ID (Region Name)
-    stunting: number;
-    kemiskinan: number;
-    perumahan: number;
-    status: string;
-    color: string; // Added color property
+    id: string; // New ID
+    kabupaten: string; // Renamed from provinsi
+    stunting: number; // Mapped from stunting_prev
+    kemiskinan: number; // Mapped from poverty_pct
+    rumah_layak_pct: number; // Renamed from perumahan
+    status: string; // Priority
+    color: string;
+    keterangan: string; // New field
 }
 
 interface DataContextType {
     data: RegionData[];
-    updateRegionData: (regionName: string, newData: Partial<RegionData>) => void;
+    updateRegionData: (mode: 'id' | 'name', identifier: string, newData: Partial<RegionData>) => void;
 }
 
 const DataContext = createContext<DataContextType | undefined>(undefined);
@@ -26,53 +28,65 @@ export const useData = () => {
 
 const initialData: RegionData[] = [
     {
-        provinsi: "Kabupaten Tambrauw",
-        stunting: 39.1,
-        kemiskinan: 32.1,
-        perumahan: 55.4, // Retaining previous housing data as user didn't provide it, or default
-        status: "Sangat Tinggi",
-        color: "#FF0000"
+        "id": "92.71",
+        "kabupaten": "Kota Sorong",
+        "stunting": 27.2,
+        "kemiskinan": 15.2,
+        "rumah_layak_pct": 68.5,
+        "status": "Sedang",
+        "color": "#FFFF00",
+        "keterangan": "Akses infrastruktur terbaik di provinsi, fokus pada pemeliharaan sanitasi."
     },
     {
-        provinsi: "Kabupaten Sorong Selatan",
-        stunting: 36.7,
-        kemiskinan: 19.5,
-        perumahan: 62.5,
-        status: "Tinggi",
-        color: "#FF4500"
+        "id": "92.01",
+        "kabupaten": "Kabupaten Sorong",
+        "stunting": 23.8,
+        "kemiskinan": 18.2,
+        "rumah_layak_pct": 55.2,
+        "status": "Sedang",
+        "color": "#FFFF00",
+        "keterangan": "Perluasan akses air minum layak untuk menekan stunting."
     },
     {
-        provinsi: "Kabupaten Raja Ampat",
-        stunting: 31.1,
-        kemiskinan: 14.5,
-        perumahan: 71.3,
-        status: "Tinggi",
-        color: "#FFA500"
+        "id": "92.04",
+        "kabupaten": "Kabupaten Raja Ampat",
+        "stunting": 31.1,
+        "kemiskinan": 14.5,
+        "rumah_layak_pct": 48.9,
+        "status": "Tinggi",
+        "color": "#FFA500",
+        "keterangan": "Intervensi sensitif pada wilayah pesisir dan kepulauan."
     },
     {
-        provinsi: "Kabupaten Maybrat",
-        stunting: 27.3,
-        kemiskinan: 30.5,
-        perumahan: 58.9,
-        status: "Sangat Tinggi",
-        color: "#FF0000"
+        "id": "92.06",
+        "kabupaten": "Kabupaten Sorong Selatan",
+        "stunting": 36.7,
+        "kemiskinan": 19.5,
+        "rumah_layak_pct": 42.5,
+        "status": "Tinggi",
+        "color": "#FF4500",
+        "keterangan": "Urgensi tinggi pada perbaikan sanitasi dasar."
     },
     {
-        provinsi: "Kota Sorong",
-        stunting: 27.2,
-        kemiskinan: 15.2,
-        perumahan: 75.2,
-        status: "Sedang",
-        color: "#FFFF00"
+        "id": "92.10",
+        "kabupaten": "Kabupaten Maybrat",
+        "stunting": 27.3,
+        "kemiskinan": 30.5,
+        "rumah_layak_pct": 40.2,
+        "status": "Sangat Tinggi",
+        "color": "#FF0000",
+        "keterangan": "Kemiskinan ekstrem berdampak langsung pada kualitas hunian."
     },
     {
-        provinsi: "Kabupaten Sorong",
-        stunting: 23.8,
-        kemiskinan: 18.2,
-        perumahan: 68.7,
-        status: "Sedang",
-        color: "#FFFF00"
-    },
+        "id": "92.09",
+        "kabupaten": "Kabupaten Tambrauw",
+        "stunting": 39.1,
+        "kemiskinan": 32.1,
+        "rumah_layak_pct": 35.8,
+        "status": "Sangat Tinggi",
+        "color": "#FF0000",
+        "keterangan": "Prioritas utama intervensi gizi spesifik dan sensitif (PUPR)."
+    }
 ];
 
 export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -102,16 +116,17 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return "#22c55e"; // Default Baik
     };
 
-    const updateRegionData = (regionName: string, newData: Partial<RegionData>) => {
+    const updateRegionData = (mode: 'id' | 'name', identifier: string, newData: Partial<RegionData>) => {
         setData((prev) =>
             prev.map((item) => {
-                if (item.provinsi === regionName) {
+                const match = mode === 'id' ? item.id === identifier : item.kabupaten === identifier;
+                if (match) {
                     const updatedItem = { ...item, ...newData };
                     // Recalculate status automatically
                     updatedItem.status = calculateStatus(
                         updatedItem.stunting,
                         updatedItem.kemiskinan,
-                        updatedItem.perumahan
+                        updatedItem.rumah_layak_pct
                     );
                     // Recalculate color automatically based on new status
                     updatedItem.color = getColorForStatus(updatedItem.status);

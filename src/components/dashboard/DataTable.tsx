@@ -44,16 +44,20 @@ const DataTable = () => {
                 <TableHead className="font-semibold">Kemiskinan (%)</TableHead>
                 <TableHead className="font-semibold">Rumah Layak (%)</TableHead>
                 <TableHead className="font-semibold">Status</TableHead>
+                <TableHead className="font-semibold">Keterangan</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {data.map((row, index) => (
-                <TableRow key={index}>
-                  <TableCell className="font-medium">{row.provinsi}</TableCell>
+              {data.map((row) => (
+                <TableRow key={row.id || row.kabupaten}>
+                  <TableCell className="font-medium">{row.kabupaten}</TableCell>
                   <TableCell>{row.stunting}%</TableCell>
                   <TableCell>{row.kemiskinan}%</TableCell>
-                  <TableCell>{row.perumahan}%</TableCell>
+                  <TableCell>{row.rumah_layak_pct}%</TableCell>
                   <TableCell>{getStatusBadge(row.status)}</TableCell>
+                  <TableCell className="text-xs text-muted-foreground max-w-[200px] truncate" title={row.keterangan}>
+                    {row.keterangan}
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
