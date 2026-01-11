@@ -6,6 +6,7 @@ export interface RegionData {
     kemiskinan: number;
     perumahan: number;
     status: string;
+    color: string; // Added color property
 }
 
 interface DataContextType {
@@ -25,46 +26,52 @@ export const useData = () => {
 
 const initialData: RegionData[] = [
     {
-        provinsi: "Kota Sorong",
-        stunting: 27.2,
-        kemiskinan: 10.5, // Retention of existing non-specified data
-        perumahan: 75.2,
-        status: "Prioritas Sedang",
-    },
-    {
-        provinsi: "Kabupaten Sorong",
-        stunting: 23.8,
-        kemiskinan: 9.5,
-        perumahan: 68.7,
-        status: "Prioritas Sedang", // "Tinggi" mapped to Prioritas Sedang based on user note
-    },
-    {
-        provinsi: "Kabupaten Raja Ampat",
-        stunting: 31.1,
-        kemiskinan: 8.2,
-        perumahan: 71.3,
+        provinsi: "Kabupaten Tambrauw",
+        stunting: 39.1,
+        kemiskinan: 32.1,
+        perumahan: 55.4, // Retaining previous housing data as user didn't provide it, or default
         status: "Sangat Tinggi",
+        color: "#FF0000"
     },
     {
         provinsi: "Kabupaten Sorong Selatan",
         stunting: 36.7,
-        kemiskinan: 7.9,
+        kemiskinan: 19.5,
         perumahan: 62.5,
-        status: "Sangat Tinggi",
+        status: "Tinggi",
+        color: "#FF4500"
+    },
+    {
+        provinsi: "Kabupaten Raja Ampat",
+        stunting: 31.1,
+        kemiskinan: 14.5,
+        perumahan: 71.3,
+        status: "Tinggi",
+        color: "#FFA500"
     },
     {
         provinsi: "Kabupaten Maybrat",
         stunting: 27.3,
-        kemiskinan: 7.5,
+        kemiskinan: 30.5,
         perumahan: 58.9,
-        status: "Prioritas Sedang",
+        status: "Sangat Tinggi",
+        color: "#FF0000"
     },
     {
-        provinsi: "Kabupaten Tambrauw",
-        stunting: 39.1,
-        kemiskinan: 6.4,
-        perumahan: 55.4,
-        status: "Sangat Tinggi",
+        provinsi: "Kota Sorong",
+        stunting: 27.2,
+        kemiskinan: 15.2,
+        perumahan: 75.2,
+        status: "Sedang",
+        color: "#FFFF00"
+    },
+    {
+        provinsi: "Kabupaten Sorong",
+        stunting: 23.8,
+        kemiskinan: 18.2,
+        perumahan: 68.7,
+        status: "Sedang",
+        color: "#FFFF00"
     },
 ];
 

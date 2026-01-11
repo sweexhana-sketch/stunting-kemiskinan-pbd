@@ -58,11 +58,14 @@ const InteractiveMap = () => {
     const region = getRegionData(feature);
     let fillColor = "#cccccc"; // Default gray
 
-    if (region) {
-      if (region.status === "Sangat Tinggi") fillColor = "#b91c1c"; // Dark Red for Critical
-      else if (region.status === "Prioritas Tinggi") fillColor = "#ef4444"; // Red (Keep for backward compatibility if any)
-      else if (region.status === "Prioritas Sedang") fillColor = "#f59e0b"; // Orange
-      else if (region.status === "Baik") fillColor = "#22c55e"; // Green
+    if (region && region.color) {
+      fillColor = region.color;
+    } else if (region) {
+      // Fallback if color is missing but status exists (though interface now requires color)
+      if (region.status === "Sangat Tinggi") fillColor = "#b91c1c";
+      else if (region.status === "Tinggi") fillColor = "#f97316";
+      else if (region.status === "Sedang") fillColor = "#eab308";
+      else if (region.status === "Baik") fillColor = "#22c55e";
     }
 
     return {
@@ -128,34 +131,34 @@ const InteractiveMap = () => {
       <div className="grid gap-4 md:grid-cols-4">
         <div className="rounded-lg border bg-card p-4">
           <div className="flex items-center gap-2">
-            <div className="h-4 w-4 rounded-full bg-red-700"></div> {/* Dark Red */}
+            <div className="h-4 w-4 rounded-full bg-[#FF0000]"></div>
             <span className="text-sm font-medium">Sangat Tinggi</span>
           </div>
           <p className="mt-1 text-xs text-muted-foreground">
-            Stunting &gt; 30% (Prioritas Utama)
+            Stunting &gt; 30% or High Poverty
           </p>
         </div>
         <div className="rounded-lg border bg-card p-4">
           <div className="flex items-center gap-2">
-            <div className="h-4 w-4 rounded-full bg-orange-500"></div> {/* Orange */}
-            <span className="text-sm font-medium">Prioritas Sedang</span>
+            <div className="h-4 w-4 rounded-full bg-[#FFA500]"></div>
+            <span className="text-sm font-medium">Tinggi</span>
           </div>
           <p className="mt-1 text-xs text-muted-foreground">
-            Stunting &gt; 20%
+            Critical attention needed
           </p>
         </div>
         <div className="rounded-lg border bg-card p-4">
           <div className="flex items-center gap-2">
-            <div className="h-4 w-4 rounded-full bg-green-500"></div> {/* Green */}
-            <span className="text-sm font-medium">Baik</span>
+            <div className="h-4 w-4 rounded-full bg-[#FFFF00]"></div>
+            <span className="text-sm font-medium">Sedang</span>
           </div>
           <p className="mt-1 text-xs text-muted-foreground">
-            Indikator terkendali
+            Moderate priority
           </p>
         </div>
         <div className="rounded-lg border bg-card p-4">
           <div className="flex items-center gap-2">
-            <div className="h-4 w-4 rounded-full bg-gray-400"></div> {/* Gray */}
+            <div className="h-4 w-4 rounded-full bg-gray-400"></div>
             <span className="text-sm font-medium">Data Tidak Tersedia</span>
           </div>
           <p className="mt-1 text-xs text-muted-foreground">
