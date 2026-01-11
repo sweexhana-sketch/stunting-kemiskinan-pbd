@@ -10,17 +10,12 @@ const RegionalAnalysis = ({ type }: RegionalAnalysisProps) => {
   const { data: contextData } = useData();
 
   const dataMap = {
-    stunting: contextData.map(item => ({ name: item.provinsi, value: item.stunting })),
-    poverty: contextData.map(item => ({ name: item.provinsi, value: item.kemiskinan })),
+    stunting: contextData.map(item => ({ name: item.provinsi, value: item.stunting, color: item.color })),
+    poverty: contextData.map(item => ({ name: item.provinsi, value: item.kemiskinan, color: item.color })), // Using same color coding for consistency
     housing: [
-      // This is aggregated data for housing, we can calculate it from the regions or keep it static if needed.
-      // For now, let's keep the static distribution or attempt to calculate it.
-      // Let's keep it static as user only provided per-region % but not total counts.
-      // OR we can map specific regions for "housing" if the user wants per-region housing chart.
-      // The original was a pie chart of "Layak" vs "Tidak Layak" aggregated.
-      { name: "Layak Huni", value: 66.8 },
-      { name: "Perlu Renovasi", value: 23.5 },
-      { name: "Tidak Layak", value: 9.7 },
+      { name: "Layak Huni", value: 66.8, color: "#22c55e" },
+      { name: "Perlu Renovasi", value: 23.5, color: "#f59e0b" },
+      { name: "Tidak Layak", value: 9.7, color: "#ef4444" },
     ],
   };
 
@@ -66,7 +61,10 @@ const RegionalAnalysis = ({ type }: RegionalAnalysisProps) => {
               dataKey="value"
             >
               {data.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                <Cell
+                  key={`cell-${index}`}
+                  fill={entry.color || COLORS[index % COLORS.length]}
+                />
               ))}
             </Pie>
             <Tooltip
