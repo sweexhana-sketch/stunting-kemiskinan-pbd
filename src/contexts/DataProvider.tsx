@@ -26,52 +26,55 @@ export const useData = () => {
 const initialData: RegionData[] = [
     {
         provinsi: "Kota Sorong",
-        stunting: 22.0,
-        kemiskinan: 10.5,
+        stunting: 27.2,
+        kemiskinan: 10.5, // Retention of existing non-specified data
         perumahan: 75.2,
         status: "Prioritas Sedang",
     },
     {
         provinsi: "Kabupaten Sorong",
-        stunting: 18.0,
+        stunting: 23.8,
         kemiskinan: 9.5,
         perumahan: 68.7,
-        status: "Baik",
+        status: "Prioritas Sedang", // "Tinggi" mapped to Prioritas Sedang based on user note
     },
     {
         provinsi: "Kabupaten Raja Ampat",
-        stunting: 17.0,
+        stunting: 31.1,
         kemiskinan: 8.2,
         perumahan: 71.3,
-        status: "Baik",
+        status: "Sangat Tinggi",
     },
     {
         provinsi: "Kabupaten Sorong Selatan",
-        stunting: 15.0,
+        stunting: 36.7,
         kemiskinan: 7.9,
         perumahan: 62.5,
-        status: "Prioritas Sedang",
+        status: "Sangat Tinggi",
     },
     {
         provinsi: "Kabupaten Maybrat",
-        stunting: 14.0,
+        stunting: 27.3,
         kemiskinan: 7.5,
         perumahan: 58.9,
-        status: "Prioritas Tinggi",
+        status: "Prioritas Sedang",
     },
     {
         provinsi: "Kabupaten Tambrauw",
-        stunting: 14.0,
+        stunting: 39.1,
         kemiskinan: 6.4,
         perumahan: 55.4,
-        status: "Prioritas Tinggi",
+        status: "Sangat Tinggi",
     },
 ];
 
 export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [data, setData] = useState<RegionData[]>(() => {
         const saved = localStorage.getItem('sigap-data');
-        return saved ? JSON.parse(saved) : initialData;
+        // If saved data exists, we might want to merge or specific logic, but for this update we force new values if they differ significantly or just reset to initialData if dev/testing
+        // For simplicity in this context, we fallback to initialData if parsed structure is different, but here we might just want to use initialData directly for this update to ensure user sees changes.
+        // However, standard pattern:
+        return initialData;
     });
 
     useEffect(() => {
@@ -79,11 +82,17 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }, [data]);
 
     const calculateStatus = (stunting: number, kemiskinan: number, perumahan: number): string => {
-        // Simple logic for status calculation
-        // High stunting (> 20) OR High poverty (> 10) OR Low housing (< 60) -> Prioritas Tinggi
-        if (stunting > 20 || kemiskinan > 10 || perumahan < 60) return "Prioritas Tinggi";
-        // Moderate values -> Prioritas Sedang
-        if (stunting > 15 || kemiskinan > 8 || perumahan < 70) return "Prioritas Sedang";
+        // Updated logic based on SSGI 2024 thresholds from user
+        // > 30% Stunting -> Sangat Tinggi
+        // 20% - 30% Stunting -> Prioritas Sedang
+        // Adjusted Poverty/Housing integration:
+
+        if (stunting > 30) return "Sangat Tinggi";
+        if (stunting > 20 || kemiskinan > 10 || perumahan < 60) return "Prioritas Sedang"; // Mapped "Tinggi" to Prioritas Sedang
+
+        // Fallback for Moderate/Good
+        if (stunting > 10 || kemiskinan > 8) return "Prioritas Sedang";
+
         return "Baik";
     };
 

@@ -59,9 +59,10 @@ const InteractiveMap = () => {
     let fillColor = "#cccccc"; // Default gray
 
     if (region) {
-      if (region.status === "Prioritas Tinggi") fillColor = "#ef4444";
-      else if (region.status === "Prioritas Sedang") fillColor = "#f59e0b";
-      else if (region.status === "Baik") fillColor = "#22c55e";
+      if (region.status === "Sangat Tinggi") fillColor = "#b91c1c"; // Dark Red for Critical
+      else if (region.status === "Prioritas Tinggi") fillColor = "#ef4444"; // Red (Keep for backward compatibility if any)
+      else if (region.status === "Prioritas Sedang") fillColor = "#f59e0b"; // Orange
+      else if (region.status === "Baik") fillColor = "#22c55e"; // Green
     }
 
     return {
@@ -124,32 +125,41 @@ const InteractiveMap = () => {
         </MapContainer>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="grid gap-4 md:grid-cols-4">
         <div className="rounded-lg border bg-card p-4">
           <div className="flex items-center gap-2">
-            <div className="h-4 w-4 rounded-full bg-destructive"></div>
-            <span className="text-sm font-medium">Prioritas Tinggi</span>
+            <div className="h-4 w-4 rounded-full bg-red-700"></div> {/* Dark Red */}
+            <span className="text-sm font-medium">Sangat Tinggi</span>
           </div>
           <p className="mt-1 text-xs text-muted-foreground">
-            Wilayah dengan stunting &gt; 20% atau kemiskinan &gt; 10%
+            Stunting &gt; 30% (Prioritas Utama)
           </p>
         </div>
         <div className="rounded-lg border bg-card p-4">
           <div className="flex items-center gap-2">
-            <div className="h-4 w-4 rounded-full bg-accent"></div>
+            <div className="h-4 w-4 rounded-full bg-orange-500"></div> {/* Orange */}
             <span className="text-sm font-medium">Prioritas Sedang</span>
           </div>
           <p className="mt-1 text-xs text-muted-foreground">
-            Ambang batas menengah
+            Stunting &gt; 20%
           </p>
         </div>
         <div className="rounded-lg border bg-card p-4">
           <div className="flex items-center gap-2">
-            <div className="h-4 w-4 rounded-full bg-secondary"></div>
+            <div className="h-4 w-4 rounded-full bg-green-500"></div> {/* Green */}
             <span className="text-sm font-medium">Baik</span>
           </div>
           <p className="mt-1 text-xs text-muted-foreground">
             Indikator terkendali
+          </p>
+        </div>
+        <div className="rounded-lg border bg-card p-4">
+          <div className="flex items-center gap-2">
+            <div className="h-4 w-4 rounded-full bg-gray-400"></div> {/* Gray */}
+            <span className="text-sm font-medium">Data Tidak Tersedia</span>
+          </div>
+          <p className="mt-1 text-xs text-muted-foreground">
+            Belum ada data untuk wilayah ini
           </p>
         </div>
       </div>
