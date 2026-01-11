@@ -89,18 +89,10 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }, [data]);
 
     const calculateStatus = (stunting: number, kemiskinan: number, perumahan: number): string => {
-        // Updated logic based on SSGI 2024 thresholds from user
-        // > 30% Stunting -> Sangat Tinggi
-        // 20% - 30% Stunting -> Prioritas Sedang
-        // Adjusted Poverty/Housing integration:
-
-        if (stunting > 30) return "Sangat Tinggi";
-        if (stunting > 20 || kemiskinan > 10 || perumahan < 60) return "Prioritas Sedang"; // Mapped "Tinggi" to Prioritas Sedang
-
-        // Fallback for Moderate/Good
-        if (stunting > 10 || kemiskinan > 8) return "Prioritas Sedang";
-
-        return "Baik";
+        // Updated logic based on SSGI 2024 and User JSON categories
+        if (stunting > 30 || kemiskinan > 25) return "Sangat Tinggi";
+        if (stunting > 20 || kemiskinan > 15) return "Tinggi";
+        return "Sedang";
     };
 
     const updateRegionData = (regionName: string, newData: Partial<RegionData>) => {

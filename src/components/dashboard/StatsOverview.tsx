@@ -25,11 +25,11 @@ const StatsOverview = () => {
     },
     {
       title: "Tingkat Kemiskinan",
-      value: "9.4%",
-      change: "-0.8%",
-      trend: "down",
+      value: "21.7%", // Average of SSGI 2024 regional data provided
+      change: "+12.3%", // vs ~9.4% previous
+      trend: "up",
       icon: Users,
-      description: "Dari tahun sebelumnya",
+      description: "Rata-rata tingkat kemiskinan provinsi",
       color: "text-secondary",
       bgColor: "bg-secondary/10",
     },
