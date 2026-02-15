@@ -59,8 +59,9 @@ const InteractiveMap = () => {
     if (region && region.color) {
       fillColor = region.color;
     } else if (region) {
-      // Fallback if color is missing but status exists (though interface now requires color)
-      if (region.status === "Sangat Tinggi") fillColor = "#b91c1c";
+      // Fallback if color is missing but status exists
+      if (region.status === "Kritis") fillColor = "#7f1d1d";
+      else if (region.status === "Sangat Tinggi") fillColor = "#b91c1c";
       else if (region.status === "Tinggi") fillColor = "#f97316";
       else if (region.status === "Sedang") fillColor = "#eab308";
       else if (region.status === "Baik") fillColor = "#22c55e";
@@ -131,11 +132,20 @@ const InteractiveMap = () => {
       <div className="grid gap-4 md:grid-cols-4">
         <div className="rounded-lg border bg-card p-4">
           <div className="flex items-center gap-2">
+            <div className="h-4 w-4 rounded-full bg-[#7f1d1d]"></div>
+            <span className="text-sm font-medium">Kritis (P1)</span>
+          </div>
+          <p className="mt-1 text-xs text-muted-foreground">
+            Urgent Intervensi Total (Maybrat/Tambrauw)
+          </p>
+        </div>
+        <div className="rounded-lg border bg-card p-4">
+          <div className="flex items-center gap-2">
             <div className="h-4 w-4 rounded-full bg-[#FF0000]"></div>
             <span className="text-sm font-medium">Sangat Tinggi</span>
           </div>
           <p className="mt-1 text-xs text-muted-foreground">
-            Stunting &gt; 30% or High Poverty
+            Stunting > 30% or High Poverty
           </p>
         </div>
         <div className="rounded-lg border bg-card p-4">

@@ -40,16 +40,17 @@ const Navigation = () => {
       label: "Monitoring",
       icon: ClipboardCheck,
     },
-  ];
-
-  // Add Data Input menu item only for authenticated users
-  if (isAuthenticated) {
-    navItems.push({
+    {
+      to: "/analysis",
+      label: "Analisis Terintegrasi",
+      icon: Target,
+    },
+    {
       to: "/data-input",
       label: "Input Data",
       icon: Database,
-    });
-  }
+    },
+  ];
 
   const handleLogout = () => {
     logout();

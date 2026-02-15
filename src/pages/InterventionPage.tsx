@@ -39,29 +39,30 @@ const InterventionPage = () => {
 
     toast.success(`Simulasi Berhasil: Stunting di ${regionName} diprediksi turun menjadi ${newStunting.toFixed(1)}%`);
   };
-  const priorityAreas = [
-    {
-      area: "Kec. Sorong Kepulauan",
-      stunting: 35.2,
-      poverty: 18.9,
-      priority: "Sangat Tinggi",
-      recommendation: "Pembangunan SPAM dan jamban sehat prioritas 1",
-    },
-    {
-      area: "Kec. Sorong Timur",
-      stunting: 32.5,
-      poverty: 15.8,
-      priority: "Tinggi",
-      recommendation: "Renovasi sistem sanitasi dan akses air bersih",
-    },
-    {
-      area: "Kec. Sorong Barat",
-      stunting: 28.3,
-      poverty: 13.2,
-      priority: "Sedang",
-      recommendation: "Peningkatan kualitas perumahan layak huni",
-    },
-  ];
+  const getRecommendation = (r: any) => {
+    if (!r) return "-";
+    if (r.status === "Kritis" || r.status === "Sangat Tinggi") {
+      if (r.rumah_layak_pct < 40) return "Pembangunan MCK Komunal & Bedah Rumah";
+      if (r.stunting > 30) return "Penyaluran bantuan pangan protein hewani lokal (ikan di Raja Ampat)";
+      return "Intervensi Terpadu Kesehatan & PKH";
+    }
+    if (r.status === "Tinggi") return "Edukasi Gizi & Sanitasi Dasar";
+    return "Pemantauan Rutin";
+  };
+
+  const priorityAreas = data
+    .filter(r => r.status !== "Baik")
+    .sort((a, b) => {
+        const priorityOrder: Record<string, number> = { "Kritis": 0, "Sangat Tinggi": 1, "Tinggi": 2, "Sedang": 3 };
+        return (priorityOrder[a.status] ?? 4) - (priorityOrder[b.status] ?? 4);
+    })
+    .map(r => ({
+      area: r.kabupaten,
+      stunting: r.stunting,
+      poverty: r.kemiskinan,
+      priority: r.status,
+      recommendation: getRecommendation(r),
+    }));
 
   const interventions = [
     {
@@ -128,7 +129,7 @@ const InterventionPage = () => {
                         <h3 className="font-semibold">{area.area}</h3>
                         <Badge
                           variant={
-                            area.priority === "Sangat Tinggi"
+                            area.priority === "Kritis" || area.priority === "Sangat Tinggi"
                               ? "destructive"
                               : area.priority === "Tinggi"
                                 ? "default"
