@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { DataProvider } from "@/contexts/DataProvider";
 import { IntegratedAnalysisProvider } from "@/contexts/IntegratedAnalysisContext";
+import { PUPRProvider } from "@/contexts/PUPRContext";
 import Index from "./pages/Index";
 import MapPage from "./pages/MapPage";
 import InterventionPage from "./pages/InterventionPage";
@@ -13,6 +14,7 @@ import MonitoringPage from "./pages/MonitoringPage";
 import LoginPage from "./pages/LoginPage";
 import DataInputPage from "./pages/DataInputPage";
 import AnalysisDashboardPage from "./pages/AnalysisDashboardPage";
+import PUPRMatrixPage from "./pages/PUPRMatrixPage";
 import NotFound from "./pages/NotFound";
 import Navigation from "./components/layout/Navigation";
 import { BarChart3 } from "lucide-react";
@@ -27,40 +29,43 @@ const App = () => (
       <AuthProvider>
         <DataProvider>
           <IntegratedAnalysisProvider>
-            <BrowserRouter>
-              <div className="min-h-screen bg-background">
-                <header className="border-b bg-card shadow-sm">
-                  <div className="container mx-auto px-4 py-6">
-                    <div className="flex items-center gap-3">
-                      <div className="flex items-center gap-2">
-                        <img src="/images/logo-pbd.png" alt="Logo Papua Barat Daya" className="h-16 w-auto object-contain" />
-                        <img src="/images/logo-pupr.png" alt="Logo PUPR" className="h-16 w-auto object-contain" />
-                      </div>
-                      <div>
-                        <h1 className="text-lg md:text-xl font-bold text-foreground leading-tight">
-                          SIGAP-DINAS PEKERJAAN UMUM DAN PERUMAHAN RAKYAT<br />PROVINSI PAPUA BARAT DAYA
-                        </h1>
-                        <p className="text-xs text-muted-foreground mt-1">
-                          Sistem Informasi Geospasial Analisis Stunting dan Kemiskinan
-                        </p>
+            <PUPRProvider>
+              <BrowserRouter>
+                <div className="min-h-screen bg-background">
+                  <header className="border-b bg-card shadow-sm">
+                    <div className="container mx-auto px-4 py-6">
+                      <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-2">
+                          <img src="/images/logo-pbd.png" alt="Logo Papua Barat Daya" className="h-16 w-auto object-contain" />
+                          <img src="/images/logo-pupr.png" alt="Logo PUPR" className="h-16 w-auto object-contain" />
+                        </div>
+                        <div>
+                          <h1 className="text-lg md:text-xl font-bold text-foreground leading-tight">
+                            SIGAP-DINAS PEKERJAAN UMUM DAN PERUMAHAN RAKYAT<br />PROVINSI PAPUA BARAT DAYA
+                          </h1>
+                          <p className="text-xs text-muted-foreground mt-1">
+                            Sistem Informasi Geospasial Analisis Stunting dan Kemiskinan
+                          </p>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </header>
-                <Navigation />
-                <Routes>
-                  <Route path="/login" element={<LoginPage />} />
-                  <Route path="/" element={<Index />} />
-                  <Route path="/map" element={<MapPage />} />
-                  <Route path="/intervention" element={<InterventionPage />} />
-                  <Route path="/monitoring" element={<MonitoringPage />} />
-                  <Route path="/data-input" element={<DataInputPage />} />
-                  <Route path="/analysis" element={<AnalysisDashboardPage />} />
-                  {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-                  <Route path="*" element={<NotFound />} />
-                </Routes>
-              </div>
-            </BrowserRouter>
+                  </header>
+                  <Navigation />
+                  <Routes>
+                    <Route path="/login" element={<LoginPage />} />
+                    <Route path="/" element={<Index />} />
+                    <Route path="/map" element={<MapPage />} />
+                    <Route path="/intervention" element={<InterventionPage />} />
+                    <Route path="/monitoring" element={<MonitoringPage />} />
+                    <Route path="/data-input" element={<DataInputPage />} />
+                    <Route path="/analysis" element={<AnalysisDashboardPage />} />
+                    <Route path="/pupr-matrix" element={<PUPRMatrixPage />} />
+                    {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                    <Route path="*" element={<NotFound />} />
+                  </Routes>
+                </div>
+              </BrowserRouter>
+            </PUPRProvider>
           </IntegratedAnalysisProvider>
         </DataProvider>
       </AuthProvider>

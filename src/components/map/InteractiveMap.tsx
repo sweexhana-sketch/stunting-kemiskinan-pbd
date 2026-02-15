@@ -145,7 +145,7 @@ const InteractiveMap = () => {
             <span className="text-sm font-medium">Sangat Tinggi</span>
           </div>
           <p className="mt-1 text-xs text-muted-foreground">
-            Stunting > 30% or High Poverty
+            Stunting &gt; 30% or High Poverty
           </p>
         </div>
         <div className="rounded-lg border bg-card p-4">

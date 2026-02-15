@@ -1,6 +1,6 @@
 import { NavLink } from "@/components/NavLink";
 import { cn } from "@/lib/utils";
-import { BarChart3, Map, Target, ClipboardCheck, Database, LogOut, User } from "lucide-react";
+import { BarChart3, Map, Target, ClipboardCheck, Database, LogOut, User, Building2 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
@@ -44,6 +44,11 @@ const Navigation = () => {
       to: "/analysis",
       label: "Analisis Terintegrasi",
       icon: Target,
+    },
+    {
+      to: "/pupr-matrix",
+      label: "Matriks PUPR",
+      icon: Building2,
     },
     {
       to: "/data-input",
